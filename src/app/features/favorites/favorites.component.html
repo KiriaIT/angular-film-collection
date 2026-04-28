@@ -3,6 +3,10 @@
     <div class="favorites__header-row">
       <div>
         <h1 class="favorites__title">Favorites</h1>
+        <p class="favorites__stats" role="status">
+          <span class="favorites__stats-label">Statistics:</span>
+          {{ favoritesStatisticsText() }}
+        </p>
         <p class="favorites__lead">
           Films you saved with the heart on the catalog. Your list is kept in this browser.
         </p>

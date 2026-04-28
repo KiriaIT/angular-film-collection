@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { BreadcrumbService } from '../../core/services/breadcrumb.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-about',
@@ -10,6 +11,8 @@ import { BreadcrumbService } from '../../core/services/breadcrumb.service';
 })
 export class AboutComponent implements OnInit {
   private readonly breadcrumbService = inject(BreadcrumbService);
+  protected readonly appName = environment.appName;
+  protected readonly apiBaseUrl = environment.apiBaseUrl;
 
   ngOnInit(): void {
     this.breadcrumbService.set([

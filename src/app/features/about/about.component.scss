@@ -20,3 +20,16 @@
 .about__text:last-child {
   margin-bottom: 0;
 }
+
+.about__config {
+  margin: 2rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.about__code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.75em;
+  word-break: break-all;
+}

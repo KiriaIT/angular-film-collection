@@ -22,6 +22,19 @@
   font-size: clamp(1.35rem, 3vw, 1.75rem);
 }
 
+.favorites__stats {
+  margin: 0 0 0.625rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--color-text);
+}
+
+.favorites__stats-label {
+  font-weight: 600;
+  margin-right: 0.35rem;
+  color: var(--color-muted);
+}
+
 .favorites__lead {
   margin: 0;
   max-width: 40rem;
