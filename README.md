@@ -8,16 +8,65 @@ Small **Angular 20** learning project: a film catalog backed by mock data. It de
 - Catalog **skeleton placeholders** on the first paint, then real cards (`afterNextRender` in `CatalogComponent` — no `setTimeout` for reactive loading state, per project rules)
 - **Empty state** when search returns no films: inline illustration, hint text, and **Reset search & sort** when filters are active
 - **Export to JSON** on the catalog toolbar — downloads the **current list** (after search and sort) as pretty-printed JSON
-- Default posters from **TMDB** / **Picsum** with automatic fallback if a URL fails
+- Mock films from **`src/app/data/films.json`** — same **`posterUrl`** strings as the RS School [films.json](https://cdn.jsdelivr.net/gh/rolling-scopes-school/tasks@master/angular/tasks/angular-intro-task/films.json) task file (`placehold.co`). **`posterDisplayUrl()`** only normalizes the URL for the `<img>` (e.g. `300x450` → `300x450.png`); the JSON file is not rewritten. On load error, fallback is still **placehold.co** with the film title
 - **Light / dark** theme toggle (persisted in `localStorage`) with smooth color transitions
 - Enter animations on cards and hover motion on posters
 - Film detail page with URL-bound `id` (`withComponentInputBinding`)
 - **Favorites** page (`/favorites`) — same cards as the catalog, list from `FilmService.favorites` `computed()`
 - About page
 - Header, breadcrumbs, and footer on every view
-- Wildcard route redirects unknown URLs to home
+- **404 page** for unknown URLs: animated illustration, **Take me home** (`routerLink`), breadcrumbs, and document title `Film Collection | Page Not Found` via the route `title` property
+- **A11y:** film cards expose **View details for …** on the navigable card; favorite control keeps `aria-label`
+- **Unit tests:** `DurationPipe` (e.g. 90 → `1h 30min`) and `FilmService.toggleFavorite()` — run with `ng test`
 
-Posters use [TMDB](https://www.themoviedb.org/) image URLs where paths stay valid; a few titles use [Lorem Picsum](https://picsum.photos/) seeds so grids always load. Broken URLs fall back to [placehold.co](https://placehold.co) with the film title.
+The repo’s `films.json` matches the official task file; poster URLs stay **placehold.co**. Normalization happens in `shared/utils/poster-display.ts` at display time only.
+
+## RS School checklist (Angular Intro: Film Collection)
+
+This task is not graded, but it is a **mandatory prerequisite** for applying for a mentor; mentors may use your repo to gauge skill. The list below mirrors the official pre-submission checklist and points to this codebase.
+
+### Components
+
+- [x] Film card accepts data via `input()` — `film-card.component.ts` (`input.required<Film>()`)
+- [x] Film card notifies parent via `output()` — `favoriteToggled` → `catalog` / `favorites`
+- [x] Film list is rendered using `@for` — `catalog.component.html`, `favorites` template
+- [x] Conditional rendering for empty search (**“Nothing found”**) — `@for` … `@empty` in `catalog.component.html` (same UX as a separate `@if`; message in the empty block)
+- [x] Details page shows full film information — `film-detail.component.html` (poster, title, year, genre, rating, duration, description)
+- [x] Header, breadcrumbs, and footer on every page — `app.component.html` shell
+
+### Routing
+
+- [x] At least 2 routes (list + details) — `app.routes.ts` (`''`, `film/:id`; also `about`, `favorites`, `**`)
+- [x] Navigation via `routerLink` — header, cards, breadcrumbs, buttons
+- [x] URL parameter on details — `FilmDetailComponent` `input.required<string>()` + `withComponentInputBinding()` in `app.config.ts`
+- [x] Wildcard handled — lazy `NotFoundComponent` for `**` (404 page)
+
+### Directive
+
+- [x] Standalone autofocus attribute directive — `shared/directives/autofocus.directive.ts`
+- [x] Sets focus when the element appears — `ngAfterViewInit` + deferred `focus()`
+- [x] Applied to the catalog search field — `catalog.component.html`
+
+### Pipe
+
+- [x] Standalone duration pipe — `shared/pipes/duration.pipe.ts`
+- [x] Human-readable minutes (`60` → `1h`, `45` → `45min`, `90` → `1h 30min`)
+- [x] Used in a component template — `film-detail.component.html`
+
+### Service and signals
+
+- [x] Film service registered globally — `FilmService` `providedIn: 'root'`
+- [x] Collection in `signal()` — `_films` in `core/services/film.service.ts`
+- [x] Favorites via `computed()` — `favorites`; catalog filtering via `computed()` — `filteredFilms` / `displayedFilms` in `catalog.component.ts`
+- [x] Search by title — `searchQuery` signal + `filteredFilms`
+
+### Code quality
+
+- [x] Mock films in a separate file — `src/app/data/films.json` (imported in `film.service.ts`)
+- [x] TypeScript strict mode — root `tsconfig.json`
+- [x] No linter errors — `ng lint`
+- [x] Logical folders — `core/`, `shared/`, `features/`, `layout/`, `models/`, `data/`
+- [x] README with description and how to run — this file
 
 ## Prerequisites
 
@@ -57,7 +106,12 @@ Lint:
 ng lint
 ```
 
+Unit tests (Karma):
+
+```bash
+ng test
+```
+
 ---
-💡 **Note:** This project was developed as part of the **RS School Angular Course**.|
- Made by me It demonstrates advanced usage of Angular Signals and Standalone architecture.
+💡 **Note:** This project was developed as part of the **RS School Angular Course**. It demonstrates advanced usage of Angular Signals and standalone architecture.
 ---

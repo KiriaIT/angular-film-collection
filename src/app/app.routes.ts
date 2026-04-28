@@ -25,5 +25,10 @@ export const routes: Routes = [
       import('./features/favorites/favorites.component').then((m) => m.FavoritesComponent),
     title: 'Favorites',
   },
-  { path: '**', redirectTo: '' },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./features/not-found/not-found.component').then((m) => m.NotFoundComponent),
+    title: 'Film Collection | Page Not Found',
+  },
 ];

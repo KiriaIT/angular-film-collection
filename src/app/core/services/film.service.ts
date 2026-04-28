@@ -1,6 +1,6 @@
 import { Injectable, computed, effect, signal } from '@angular/core';
 import { Film } from '../../models/film.model';
-import { FILMS_MOCK } from '../../data/films.mock';
+import filmsJson from '../../data/films.json';
 
 const FAVORITE_IDS_KEY = 'film-collection-favorite-ids';
 
@@ -25,14 +25,14 @@ function readFavoriteIds(): ReadonlySet<number> {
   }
 }
 
-function initialFilmsFromMock(): Film[] {
+function initialFilmsFromJson(): Film[] {
   const favoriteIds = readFavoriteIds();
-  return FILMS_MOCK.map((f) => ({ ...f, isFavorite: favoriteIds.has(f.id) }));
+  return (filmsJson as Film[]).map((f) => ({ ...f, isFavorite: favoriteIds.has(f.id) }));
 }
 
 @Injectable({ providedIn: 'root' })
 export class FilmService {
-  private readonly _films = signal<Film[]>(initialFilmsFromMock());
+  private readonly _films = signal<Film[]>(initialFilmsFromJson());
 
   readonly films = this._films.asReadonly();
   readonly favorites = computed(() => this._films().filter((f) => f.isFavorite));

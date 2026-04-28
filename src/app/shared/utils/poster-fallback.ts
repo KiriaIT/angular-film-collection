@@ -1,5 +1,5 @@
-/** Placeholder when a remote poster fails to load (broken URL, blockers, offline). */
+/** როცა პირველადი `posterUrl` ვერ იტვირთება — იგივე სერვისი, სათაურით (placehold.co + .png). */
 export function posterFallbackUrl(title: string): string {
-  const short = title.trim().slice(0, 28) || 'Film';
-  return `https://placehold.co/300x450/1a1a2e/e8e8e8?text=${encodeURIComponent(short)}`;
+  const short = title.trim().slice(0, 40) || 'Film';
+  return `https://placehold.co/300x450.png?text=${encodeURIComponent(short)}`;
 }

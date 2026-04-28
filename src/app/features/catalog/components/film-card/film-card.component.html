@@ -1,13 +1,17 @@
-<article class="film-card" [@cardEnter] [routerLink]="['/film', film().id]">
+<article
+  class="film-card"
+  [@cardEnter]
+  [routerLink]="['/film', film().id]"
+  [attr.aria-label]="'View details for ' + film().title"
+>
   <div class="film-card__media">
     <img
-      [src]="film().posterUrl"
+      [src]="posterSrc()"
       [alt]="film().title"
       class="film-card__poster"
       loading="lazy"
       width="300"
       height="450"
-      referrerpolicy="no-referrer"
       decoding="async"
       (error)="onPosterError($event)"
     />

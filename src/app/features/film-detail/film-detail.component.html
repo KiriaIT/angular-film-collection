@@ -1,13 +1,12 @@
 @if (film(); as f) {
   <article class="film-detail">
     <img
-      [src]="f.posterUrl"
+      [src]="posterSrc()"
       [alt]="f.title"
       class="film-detail__poster"
       loading="lazy"
       width="320"
       height="480"
-      referrerpolicy="no-referrer"
       decoding="async"
       (error)="onPosterError($event, f.title)"
     />

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { RouterLink } from '@angular/router';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Film } from '../../../../models/film.model';
+import { posterDisplayUrl } from '../../../../shared/utils/poster-display';
 import { posterFallbackUrl } from '../../../../shared/utils/poster-fallback';
 
 @Component({
@@ -28,6 +29,8 @@ export class FilmCardComponent {
   readonly favoriteToggled = output<number>();
 
   protected readonly isHighRated = computed(() => this.film().rating >= 8);
+
+  protected readonly posterSrc = computed(() => posterDisplayUrl(this.film().posterUrl));
 
   protected onPosterError(event: Event): void {
     const el = event.target;
