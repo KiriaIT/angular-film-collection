@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { DurationPipe } from '../../shared/pipes/duration.pipe';
 import { FilmService } from '../../core/services/film.service';
 import { BreadcrumbService } from '../../core/services/breadcrumb.service';
+import { posterFallbackUrl } from '../../shared/utils/poster-fallback';
 
 @Component({
   selector: 'app-film-detail',
@@ -28,4 +29,13 @@ export class FilmDetailComponent {
       { label: f?.title ?? 'Film', url: `/film/${routeId}` },
     ]);
   });
+
+  protected onPosterError(event: Event, title: string): void {
+    const el = event.target;
+    if (!(el instanceof HTMLImageElement)) {
+      return;
+    }
+    el.src = posterFallbackUrl(title);
+    el.onerror = null;
+  }
 }

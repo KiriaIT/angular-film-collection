@@ -1,13 +1,16 @@
 <header class="header">
   <a routerLink="/" class="header__logo">🎬 Film Collection</a>
-  <nav class="header__nav" aria-label="Main">
-    <a
-      routerLink="/"
-      routerLinkActive="header__link--active"
-      [routerLinkActiveOptions]="{ exact: true }"
-      class="header__link"
-      >Home</a
-    >
-    <a routerLink="/about" routerLinkActive="header__link--active" class="header__link">About</a>
-  </nav>
+  <div class="header__right">
+    <nav class="header__nav" aria-label="Main">
+      <a
+        routerLink="/"
+        routerLinkActive="header__link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="header__link"
+        >Home</a
+      >
+      <a routerLink="/about" routerLinkActive="header__link--active" class="header__link">About</a>
+    </nav>
+    <app-theme-toggle />
+  </div>
 </header>

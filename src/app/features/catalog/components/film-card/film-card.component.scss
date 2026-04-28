@@ -8,11 +8,12 @@
   cursor: pointer;
   text-decoration: none;
   color: inherit;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    border-color 0.28s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
   }
 
   &:focus-visible {
@@ -21,12 +22,21 @@
   }
 }
 
+.film-card__media {
+  position: relative;
+}
+
 .film-card__poster {
   width: 100%;
   aspect-ratio: 2 / 3;
   object-fit: cover;
   display: block;
   background: #0a0a0a;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.film-card:hover .film-card__poster {
+  transform: scale(1.03);
 }
 
 .film-card__body {

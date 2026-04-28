@@ -4,11 +4,16 @@ Small **Angular 20** learning project: a film catalog backed by mock data. It de
 
 ## Features
 
-- Home catalog with title search, favorite toggles, and navigation to film details
+- Home catalog with title search, sort by title/year/rating, **Clear all** to reset filters, favorite toggles (favorites **persist** in `localStorage` across refresh), and navigation to film details
+- Default posters from **TMDB** / **Picsum** with automatic fallback if a URL fails
+- **Light / dark** theme toggle (persisted in `localStorage`) with smooth color transitions
+- Enter animations on cards and hover motion on posters
 - Film detail page with URL-bound `id` (`withComponentInputBinding`)
 - About page
 - Header, breadcrumbs, and footer on every view
 - Wildcard route redirects unknown URLs to home
+
+Posters use [TMDB](https://www.themoviedb.org/) image URLs where paths stay valid; a few titles use [Lorem Picsum](https://picsum.photos/) seeds so grids always load. Broken URLs fall back to [placehold.co](https://placehold.co) with the film title.
 
 ## Prerequisites
 
@@ -48,10 +53,7 @@ Lint:
 ng lint
 ```
 
-## Customize
-
-- Replace **Your Name** and the GitHub URL in `src/app/layout/footer/footer.component.ts` before publishing your repository.
-
-## Data
-
-Films are defined in `src/app/data/films.mock.ts` (sourced from the Rolling Scopes School task JSON).
+---
+💡 **Note:** This project was developed as part of the **RS School Angular Course**.|
+ Made by me It demonstrates advanced usage of Angular Signals and Standalone architecture.
+---

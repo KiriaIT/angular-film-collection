@@ -1,19 +1,58 @@
 <section class="catalog">
-  <label class="catalog__search-wrap">
-    <span class="visually-hidden">Search films</span>
-    <input
-      appAutofocus
-      type="search"
-      class="catalog__search"
-      placeholder="Search films by title..."
-      [value]="searchQuery()"
-      (input)="onSearchChange($event)"
-      autocomplete="off"
-      aria-label="Search films"
-    />
-  </label>
+  <div class="catalog__toolbar">
+    <label class="catalog__search-wrap">
+      <span class="visually-hidden">Search films</span>
+      <input
+        appAutofocus
+        type="search"
+        class="catalog__search"
+        placeholder="Search films by title..."
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+        autocomplete="off"
+        aria-label="Search films"
+      />
+    </label>
+    <div class="catalog__sort-group" role="group" aria-label="Sort films">
+      <label class="catalog__sort">
+        <span class="catalog__sort-label">Sort by</span>
+        <select
+          class="catalog__select"
+          [value]="sortKey()"
+          (change)="onSortKeyChange($event)"
+          aria-label="Sort by field"
+        >
+          <option value="title">Title</option>
+          <option value="year">Year</option>
+          <option value="rating">Rating</option>
+        </select>
+      </label>
+      <label class="catalog__sort">
+        <span class="catalog__sort-label">Order</span>
+        <select
+          class="catalog__select"
+          [value]="sortDir()"
+          (change)="onSortDirChange($event)"
+          aria-label="Sort direction"
+        >
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+      @if (hasActiveFilters()) {
+        <button
+          type="button"
+          class="catalog__clear"
+          (click)="onClearFilters()"
+          aria-label="Clear search and reset sort to defaults"
+        >
+          Clear all
+        </button>
+      }
+    </div>
+  </div>
   <div class="catalog__grid">
-    @for (film of filteredFilms(); track film.id) {
+    @for (film of displayedFilms(); track film.id) {
       <app-film-card [film]="film" (favoriteToggled)="onFavoriteToggled($event)" />
     } @empty {
       <p class="catalog__empty">Nothing found</p>

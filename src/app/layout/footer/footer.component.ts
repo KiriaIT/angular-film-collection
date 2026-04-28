@@ -8,7 +8,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     <footer class="footer">
       <span>© {{ year }} Kiria </span>
       <a
-        href="https://github.com/your-username/angular-film-collection"
+          href="https://github.com/KiriaIT/angular-film-collection"
         target="_blank"
         rel="noopener noreferrer"
         class="footer__link"

@@ -1,0 +1,8 @@
+<button
+  type="button"
+  class="theme-toggle"
+  [attr.aria-label]="ariaLabel()"
+  (click)="onToggle()"
+>
+  <span class="theme-toggle__icon" aria-hidden="true">{{ theme() === 'dark' ? '☀️' : '🌙' }}</span>
+</button>

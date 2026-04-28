@@ -9,6 +9,15 @@
   --transition-fast: 150ms ease;
 }
 
+:root[data-app-theme='light'] {
+  --color-primary: #b20710;
+  --color-bg: #e8eaed;
+  --color-surface: #ffffff;
+  --color-text: #121212;
+  --color-muted: #5f6368;
+  --color-border: #dadce0;
+}
+
 *,
 *::before,
 *::after {
@@ -27,6 +36,7 @@ body {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-bg);
+  transition: background-color 0.28s ease, color 0.28s ease;
 }
 
 .visually-hidden {

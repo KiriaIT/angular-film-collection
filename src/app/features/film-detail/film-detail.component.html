@@ -1,6 +1,16 @@
 @if (film(); as f) {
   <article class="film-detail">
-    <img [src]="f.posterUrl" [alt]="f.title" class="film-detail__poster" loading="lazy" />
+    <img
+      [src]="f.posterUrl"
+      [alt]="f.title"
+      class="film-detail__poster"
+      loading="lazy"
+      width="320"
+      height="480"
+      referrerpolicy="no-referrer"
+      decoding="async"
+      (error)="onPosterError($event, f.title)"
+    />
     <div class="film-detail__info">
       <h1 class="film-detail__title">{{ f.title }}</h1>
       <p class="film-detail__meta">
