@@ -19,5 +19,11 @@ export const routes: Routes = [
       import('./features/about/about.component').then((m) => m.AboutComponent),
     title: 'About',
   },
+  {
+    path: 'favorites',
+    loadComponent: () =>
+      import('./features/favorites/favorites.component').then((m) => m.FavoritesComponent),
+    title: 'Favorites',
+  },
   { path: '**', redirectTo: '' },
 ];

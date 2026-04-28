@@ -2,10 +2,11 @@
   display: grid;
   grid-template-columns: minmax(200px, 320px) 1fr;
   gap: 2rem;
-  padding: 1.5rem;
+  padding: var(--page-pad-block) var(--page-pad-inline);
   max-width: 960px;
   margin: 0 auto;
   align-items: start;
+  width: 100%;
 }
 
 .film-detail__poster {
@@ -102,5 +103,22 @@
 @media (max-width: 700px) {
   .film-detail {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .film-detail__poster {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 399px) {
+  .film-detail__poster {
+    max-width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    min-height: 48px;
   }
 }

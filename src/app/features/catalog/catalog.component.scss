@@ -1,7 +1,8 @@
 .catalog {
-  padding: 1.5rem;
+  padding: var(--page-pad-block) var(--page-pad-inline);
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .catalog__toolbar {
@@ -36,6 +37,30 @@
     color: var(--color-text);
     border-color: var(--color-primary);
     background: rgba(229, 9, 20, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.catalog__export {
+  padding: 0.55rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+    color var(--transition-fast);
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: rgba(229, 9, 20, 0.06);
   }
 
   &:focus-visible {
@@ -103,15 +128,185 @@
 
 .catalog__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
   gap: 1.25rem;
 }
 
-.catalog__empty {
+@keyframes catalog-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+.catalog__skeleton-card {
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  pointer-events: none;
+}
+
+.catalog__skeleton-shimmer {
+  background: linear-gradient(
+    105deg,
+    var(--color-bg) 0%,
+    var(--color-surface) 35%,
+    rgba(255, 255, 255, 0.12) 50%,
+    var(--color-surface) 65%,
+    var(--color-bg) 100%
+  );
+  background-size: 220% 100%;
+  animation: catalog-shimmer 1.35s ease-in-out infinite;
+}
+
+:root[data-app-theme='light'] .catalog__skeleton-shimmer {
+  background: linear-gradient(
+    105deg,
+    #e8eaed 0%,
+    #ffffff 35%,
+    rgba(0, 0, 0, 0.06) 50%,
+    #ffffff 65%,
+    #e8eaed 100%
+  );
+  background-size: 220% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog__skeleton-shimmer {
+    animation: none;
+    background: var(--color-border);
+    opacity: 0.5;
+  }
+}
+
+.catalog__skeleton-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  display: block;
+}
+
+.catalog__skeleton-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.catalog__skeleton-line {
+  height: 0.75rem;
+  border-radius: 4px;
+}
+
+.catalog__skeleton-line--title {
+  width: 88%;
+}
+
+.catalog__skeleton-line--meta {
+  width: 58%;
+}
+
+.catalog__empty-state {
   grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 2rem 1rem 3rem;
+  max-width: 28rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.catalog__empty-illustration {
+  width: min(100%, 200px);
+  height: auto;
   color: var(--color-muted);
-  font-size: 1.0625rem;
-  margin: 0;
+  margin-bottom: 1.25rem;
+}
+
+.catalog__empty-svg-fill {
+  fill: currentColor;
+}
+
+.catalog__empty-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.catalog__empty-hint {
+  margin: 0 0 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+
+.catalog__empty-reset {
+  padding: 0.65rem 1.35rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  transition: filter var(--transition-fast), transform var(--transition-fast);
+
+  &:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+}
+
+@media (max-width: 639px) {
+  .catalog__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .catalog__sort-group {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .catalog__sort {
+    width: 100%;
+  }
+
+  .catalog__select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .catalog__clear,
+  .catalog__export {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .catalog__search {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+
+  .catalog__grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 156px), 1fr));
+    gap: 1rem;
+  }
+
+  .catalog__empty-reset {
+    width: 100%;
+    min-height: 48px;
+  }
 }

@@ -5,10 +5,14 @@ Small **Angular 20** learning project: a film catalog backed by mock data. It de
 ## Features
 
 - Home catalog with title search, sort by title/year/rating, **Clear all** to reset filters, favorite toggles (favorites **persist** in `localStorage` across refresh), and navigation to film details
+- Catalog **skeleton placeholders** on the first paint, then real cards (`afterNextRender` in `CatalogComponent` — no `setTimeout` for reactive loading state, per project rules)
+- **Empty state** when search returns no films: inline illustration, hint text, and **Reset search & sort** when filters are active
+- **Export to JSON** on the catalog toolbar — downloads the **current list** (after search and sort) as pretty-printed JSON
 - Default posters from **TMDB** / **Picsum** with automatic fallback if a URL fails
 - **Light / dark** theme toggle (persisted in `localStorage`) with smooth color transitions
 - Enter animations on cards and hover motion on posters
 - Film detail page with URL-bound `id` (`withComponentInputBinding`)
+- **Favorites** page (`/favorites`) — same cards as the catalog, list from `FilmService.favorites` `computed()`
 - About page
 - Header, breadcrumbs, and footer on every view
 - Wildcard route redirects unknown URLs to home

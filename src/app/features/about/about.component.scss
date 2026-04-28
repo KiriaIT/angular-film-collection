@@ -1,7 +1,8 @@
 .about {
-  padding: 1.5rem;
+  padding: var(--page-pad-block) var(--page-pad-inline);
   max-width: 720px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .about__title {

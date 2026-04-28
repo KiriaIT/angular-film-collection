@@ -1,8 +1,17 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { FilmCardComponent } from './components/film-card/film-card.component';
 import { AutofocusDirective } from '../../shared/directives/autofocus.directive';
 import { FilmService } from '../../core/services/film.service';
 import { BreadcrumbService } from '../../core/services/breadcrumb.service';
+import { JsonExportService } from '../../core/services/json-export.service';
 
 export type CatalogSortKey = 'title' | 'year' | 'rating';
 export type CatalogSortDir = 'asc' | 'desc';
@@ -18,6 +27,14 @@ export type CatalogSortDir = 'asc' | 'desc';
 export class CatalogComponent implements OnInit {
   private readonly filmService = inject(FilmService);
   private readonly breadcrumbService = inject(BreadcrumbService);
+  private readonly jsonExportService = inject(JsonExportService);
+
+  /** First paint shows skeletons; no setTimeout — uses browser render hook only. */
+  protected readonly catalogContentReady = signal(false);
+
+  protected readonly skeletonSlots: readonly number[] = [
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+  ];
 
   protected readonly searchQuery = signal('');
   protected readonly sortKey = signal<CatalogSortKey>('title');
@@ -52,6 +69,12 @@ export class CatalogComponent implements OnInit {
     });
     return films;
   });
+
+  constructor() {
+    afterNextRender(() => {
+      this.catalogContentReady.set(true);
+    });
+  }
 
   ngOnInit(): void {
     this.breadcrumbService.set([{ label: 'Home', url: '/' }]);
@@ -88,6 +111,14 @@ export class CatalogComponent implements OnInit {
     this.searchQuery.set('');
     this.sortKey.set('title');
     this.sortDir.set('asc');
+  }
+
+  protected onExportCatalogJson(): void {
+    const stamp = new Date().toISOString().slice(0, 10);
+    this.jsonExportService.downloadFilmsAsJson(
+      this.displayedFilms(),
+      `film-collection-catalog-${stamp}.json`,
+    );
   }
 
   protected onFavoriteToggled(id: number): void {

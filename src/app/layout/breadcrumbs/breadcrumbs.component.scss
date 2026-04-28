@@ -3,11 +3,15 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.65rem var(--page-pad-inline);
   font-size: 0.875rem;
   color: var(--color-muted);
   background: rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid var(--color-border);
+}
+
+:root[data-app-theme='light'] .breadcrumbs {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .breadcrumbs__link {

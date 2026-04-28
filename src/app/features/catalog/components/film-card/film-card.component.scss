@@ -40,12 +40,13 @@
 }
 
 .film-card__body {
+  position: relative;
   padding: 1rem;
+  padding-right: 3.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
-  position: relative;
 }
 
 .film-card__title {
@@ -69,26 +70,66 @@
 
 .film-card__fav {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: none;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 2;
+  width: 2.625rem;
+  height: 2.625rem;
+  padding: 0;
+  border: 2px solid var(--color-border);
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
-  color: var(--color-text);
-  font-size: 1.125rem;
-  line-height: 1;
+  background: var(--color-bg);
+  color: var(--color-muted);
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease,
+    box-shadow 0.15s ease;
 
   &:hover {
-    background: rgba(229, 9, 20, 0.35);
+    transform: scale(1.06);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
   &.film-card__fav--active {
-    color: var(--color-primary);
+    border-color: #9b060d;
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(229, 9, 20, 0.5);
+
+    &:hover {
+      transform: scale(1.06);
+      border-color: #fff;
+      box-shadow: 0 3px 12px rgba(229, 9, 20, 0.6);
+    }
+  }
+}
+
+.film-card__fav-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  display: block;
+  transform: translateY(0.02em);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (max-width: 639px) {
+  .film-card__body {
+    padding-right: 3.5rem;
+  }
+
+  .film-card__fav {
+    width: 44px;
+    height: 44px;
+    top: 0.5rem;
+    right: 0.5rem;
   }
 }

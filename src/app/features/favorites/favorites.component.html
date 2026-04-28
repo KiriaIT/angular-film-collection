@@ -1,0 +1,16 @@
+<section class="favorites">
+  <header class="favorites__header">
+    <h1 class="favorites__title">Favorites</h1>
+    <p class="favorites__lead">Films you saved with the heart on the catalog. Your list is kept in this browser.</p>
+  </header>
+  <div class="favorites__grid">
+    @for (film of favorites(); track film.id) {
+      <app-film-card [film]="film" (favoriteToggled)="onFavoriteToggled($event)" />
+    } @empty {
+      <div class="favorites__empty">
+        <p class="favorites__empty-text">No favorites yet.</p>
+        <a routerLink="/" class="favorites__browse">Browse the catalog</a>
+      </div>
+    }
+  </div>
+</section>

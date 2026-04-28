@@ -49,13 +49,88 @@
           Clear all
         </button>
       }
+      <button
+        type="button"
+        class="catalog__export"
+        (click)="onExportCatalogJson()"
+        aria-label="Export currently listed films to a JSON file"
+      >
+        Export to JSON
+      </button>
     </div>
   </div>
-  <div class="catalog__grid">
-    @for (film of displayedFilms(); track film.id) {
-      <app-film-card [film]="film" (favoriteToggled)="onFavoriteToggled($event)" />
-    } @empty {
-      <p class="catalog__empty">Nothing found</p>
-    }
-  </div>
+
+  @if (!catalogContentReady()) {
+    <div
+      class="catalog__grid catalog__grid--skeleton"
+      aria-busy="true"
+      aria-label="Loading film catalog"
+    >
+      @for (slot of skeletonSlots; track slot) {
+        <div class="catalog__skeleton-card">
+          <div class="catalog__skeleton-shimmer catalog__skeleton-poster"></div>
+          <div class="catalog__skeleton-body">
+            <div class="catalog__skeleton-shimmer catalog__skeleton-line catalog__skeleton-line--title"></div>
+            <div class="catalog__skeleton-shimmer catalog__skeleton-line catalog__skeleton-line--meta"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="catalog__grid" role="list">
+      @for (film of displayedFilms(); track film.id) {
+        <app-film-card [film]="film" (favoriteToggled)="onFavoriteToggled($event)" />
+      } @empty {
+        <div class="catalog__empty-state">
+          <svg
+            class="catalog__empty-illustration"
+            viewBox="0 0 200 140"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <rect
+              x="24"
+              y="20"
+              width="92"
+              height="100"
+              rx="6"
+              stroke="currentColor"
+              stroke-width="2"
+              opacity="0.35"
+            />
+            <rect x="36" y="36" width="68" height="48" rx="4" class="catalog__empty-svg-fill" opacity="0.2" />
+            <path
+              d="M128 32h48a6 6 0 0 1 6 6v64a6 6 0 0 1-6 6h-48a6 6 0 0 1-6-6V38a6 6 0 0 1 6-6Z"
+              stroke="currentColor"
+              stroke-width="2"
+              opacity="0.35"
+            />
+            <circle cx="148" cy="52" r="10" class="catalog__empty-svg-fill" opacity="0.25" />
+            <path
+              d="M134 88h40M134 100h28"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              opacity="0.35"
+            />
+            <circle cx="100" cy="118" r="5" fill="currentColor" opacity="0.45" />
+          </svg>
+          <h2 class="catalog__empty-title">Nothing found</h2>
+          <p class="catalog__empty-hint">
+            @if (hasActiveFilters()) {
+              No films match your search or filters. Try resetting below.
+            } @else {
+              The catalog is empty.
+            }
+          </p>
+          @if (hasActiveFilters()) {
+            <button type="button" class="catalog__empty-reset" (click)="onClearFilters()">
+              Reset search &amp; sort
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
 </section>
