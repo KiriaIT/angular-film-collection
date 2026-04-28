@@ -1,0 +1,22 @@
+<section class="catalog">
+  <label class="catalog__search-wrap">
+    <span class="visually-hidden">Search films</span>
+    <input
+      appAutofocus
+      type="search"
+      class="catalog__search"
+      placeholder="Search films by title..."
+      [value]="searchQuery()"
+      (input)="onSearchChange($event)"
+      autocomplete="off"
+      aria-label="Search films"
+    />
+  </label>
+  <div class="catalog__grid">
+    @for (film of filteredFilms(); track film.id) {
+      <app-film-card [film]="film" (favoriteToggled)="onFavoriteToggled($event)" />
+    } @empty {
+      <p class="catalog__empty">Nothing found</p>
+    }
+  </div>
+</section>

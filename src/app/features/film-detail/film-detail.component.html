@@ -1,0 +1,33 @@
+@if (film(); as f) {
+  <article class="film-detail">
+    <img [src]="f.posterUrl" [alt]="f.title" class="film-detail__poster" loading="lazy" />
+    <div class="film-detail__info">
+      <h1 class="film-detail__title">{{ f.title }}</h1>
+      <p class="film-detail__meta">
+        {{ f.year }} ·
+        @switch (f.genre) {
+          @case ('Drama') {
+            <span class="film-detail__badge film-detail__badge--drama">Drama</span>
+          }
+          @case ('Action') {
+            <span class="film-detail__badge film-detail__badge--action">Action</span>
+          }
+          @case ('Sci-Fi') {
+            <span class="film-detail__badge film-detail__badge--scifi">Sci-Fi</span>
+          }
+          @default {
+            <span class="film-detail__badge">{{ f.genre }}</span>
+          }
+        }
+        · {{ f.duration | duration }} · ★ {{ f.rating }}
+      </p>
+      <p class="film-detail__description">{{ f.description }}</p>
+      <a routerLink="/" class="btn btn--back">← Back to catalog</a>
+    </div>
+  </article>
+} @else {
+  <div class="film-detail__not-found">
+    <p>Film not found.</p>
+    <a routerLink="/" class="btn">← Go back</a>
+  </div>
+}

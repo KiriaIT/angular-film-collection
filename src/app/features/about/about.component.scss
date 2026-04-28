@@ -1,0 +1,21 @@
+.about {
+  padding: 1.5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.about__title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.about__lead,
+.about__text {
+  margin: 0 0 1rem;
+  line-height: 1.65;
+  color: var(--color-muted);
+}
+
+.about__text:last-child {
+  margin-bottom: 0;
+}
