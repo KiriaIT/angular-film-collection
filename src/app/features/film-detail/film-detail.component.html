@@ -34,6 +34,17 @@
       <a routerLink="/" class="btn btn--back">← Back to catalog</a>
     </div>
   </article>
+
+  @if (similarFilms().length > 0) {
+    <section class="film-detail__similar" aria-labelledby="film-detail-similar-heading">
+      <h2 id="film-detail-similar-heading" class="film-detail__similar-title">Similar Movies</h2>
+      <div class="film-detail__similar-grid" role="list">
+        @for (similar of similarFilms(); track similar.id) {
+          <app-film-card [film]="similar" (favoriteToggled)="onFavoriteToggled($event)" />
+        }
+      </div>
+    </section>
+  }
 } @else {
   <div class="film-detail__not-found">
     <p>Film not found.</p>

@@ -3,13 +3,20 @@ import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './layout/header/header.component';
 import { FooterComponent } from './layout/footer/footer.component';
 import { BreadcrumbsComponent } from './layout/breadcrumbs/breadcrumbs.component';
+import { ScrollToTopComponent } from './layout/scroll-to-top/scroll-to-top.component';
 import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, BreadcrumbsComponent],
+  imports: [
+    RouterOutlet,
+    HeaderComponent,
+    FooterComponent,
+    BreadcrumbsComponent,
+    ScrollToTopComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
