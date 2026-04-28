@@ -1,0 +1,941 @@
+---
+description: Angular Film Collection — strict coding rules for Cursor AI. Enforces Angular 20+ signals-only architecture, standalone components, clean architecture, SOLID/DRY/KISS, lifecycle hooks discipline, and performance patterns.
+globs:
+  - "**/*.ts"
+  - "**/*.html"
+  - "**/*.scss"
+alwaysApply: true
+---
+
+# Angular Film Collection — Cursor Rules
+
+## ══════════════════════════════════════════
+## 1. PROJECT OVERVIEW & HARD CONSTRAINTS
+## ══════════════════════════════════════════
+
+This is an Angular 20+ standalone-component application called **Film Collection**.
+It is a course submission project — clean, readable, and architecturally correct code matters above all.
+
+### ABSOLUTE PROHIBITIONS — never violate these:
+- ❌ NO RxJS — not a single `Observable`, `Subject`, `BehaviorSubject`, `pipe()`, `subscribe()`
+- ❌ NO NgModules — every component/pipe/directive must be `standalone: true`
+- ❌ NO UI libraries (Angular Material, PrimeNG, etc.)
+- ❌ NO `any` type — TypeScript strict mode is ON
+- ❌ NO raw DOM access (`document.getElementById`, `querySelector`) outside directives
+- ❌ NO logic inside templates beyond simple conditionals
+- ❌ NO `setTimeout`/`setInterval` for reactive state (exception: autofocus timing only)
+- ❌ NO `*ngFor`, `*ngIf`, `*ngSwitch` structural directives
+- ❌ NO `@Input()` / `@Output()` decorators — use `input()` / `output()` functions
+- ❌ NO constructor-based dependency injection — always use `inject()`
+- ❌ NO `toSignal` / `toObservable` from rxjs-interop — forbidden bridge to RxJS
+- ❌ NO `ActivatedRoute` in components — use `input()` with `withComponentInputBinding()`
+
+### MANDATORY TECHNOLOGIES:
+- ✅ Angular 20+ with standalone components
+- ✅ Angular Signals: `signal()`, `computed()`, `effect()`, `input()`, `output()`
+- ✅ New control flow: `@if`, `@for`, `@switch`, `@empty`
+- ✅ TypeScript strict mode (`"strict": true` in tsconfig)
+- ✅ SCSS for styles (plain — no Tailwind, no Bootstrap)
+- ✅ `RouterLink`, `RouterLinkActive` for navigation
+- ✅ `withComponentInputBinding()` in `provideRouter` — route params via `input()`
+
+---
+
+## ══════════════════════════════════════════
+## 2. FOLDER STRUCTURE — CLEAN ARCHITECTURE
+## ══════════════════════════════════════════
+
+Strictly follow this structure. Never put files in wrong folders.
+
+```
+src/
+└── app/
+    ├── core/
+    │   └── services/
+    │       ├── film.service.ts          # Film state — signal-based, singleton
+    │       └── breadcrumb.service.ts    # Breadcrumb state — signal-based, singleton
+    │
+    ├── shared/
+    │   ├── directives/
+    │   │   └── autofocus.directive.ts   # Standalone attribute directive
+    │   └── pipes/
+    │       └── duration.pipe.ts         # Standalone pure pipe
+    │
+    ├── features/
+    │   ├── catalog/                     # Route: /
+    │   │   ├── catalog.component.ts
+    │   │   ├── catalog.component.html
+    │   │   ├── catalog.component.scss
+    │   │   └── components/
+    │   │       └── film-card/
+    │   │           ├── film-card.component.ts
+    │   │           ├── film-card.component.html
+    │   │           └── film-card.component.scss
+    │   ├── film-detail/                 # Route: /film/:id
+    │   │   ├── film-detail.component.ts
+    │   │   ├── film-detail.component.html
+    │   │   └── film-detail.component.scss
+    │   └── about/                       # Route: /about
+    │       ├── about.component.ts
+    │       ├── about.component.html
+    │       └── about.component.scss
+    │
+    ├── layout/                          # Shell — on every page
+    │   ├── header/
+    │   │   ├── header.component.ts
+    │   │   ├── header.component.html
+    │   │   └── header.component.scss
+    │   ├── footer/
+    │   │   ├── footer.component.ts
+    │   │   └── footer.component.scss
+    │   └── breadcrumbs/
+    │       ├── breadcrumbs.component.ts
+    │       ├── breadcrumbs.component.html
+    │       └── breadcrumbs.component.scss
+    │
+    ├── data/
+    │   └── films.mock.ts                # FILMS_MOCK: Film[]
+    │
+    ├── models/
+    │   ├── film.model.ts                # Film interface
+    │   └── breadcrumb.model.ts          # Breadcrumb interface
+    │
+    ├── app.routes.ts
+    ├── app.component.ts                 # Root shell — layout only, zero logic
+    ├── app.component.html               # header / breadcrumbs / router-outlet / footer
+    └── app.config.ts                    # provideRouter + withComponentInputBinding
+```
+
+**Layer rules:**
+- `core/` → singletons; no component imports allowed here
+- `shared/` → used in 2+ features; zero business-domain logic
+- `features/` → self-contained slices; components inside are private to their feature
+- `layout/` → structural shell; reads from services, never from feature components
+- `models/` → pure TypeScript interfaces — NEVER import Angular here
+
+---
+
+## ══════════════════════════════════════════
+## 3. APP CONFIG & ROOT COMPONENT
+## ══════════════════════════════════════════
+
+### app.config.ts — `withComponentInputBinding` is mandatory:
+```typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes, withComponentInputBinding()),
+    // withComponentInputBinding() binds :id URL param directly to input()
+    // This removes the need for ActivatedRoute in any component
+  ],
+};
+```
+
+### app.component.ts — layout shell, zero logic:
+```typescript
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './layout/header/header.component';
+import { FooterComponent } from './layout/footer/footer.component';
+import { BreadcrumbsComponent } from './layout/breadcrumbs/breadcrumbs.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, BreadcrumbsComponent],
+  templateUrl: './app.component.html',
+})
+export class AppComponent {}
+```
+
+### app.component.html:
+```html
+<app-header />
+<app-breadcrumbs />
+<main class="content">
+  <router-outlet />
+</main>
+<app-footer />
+```
+
+---
+
+## ══════════════════════════════════════════
+## 4. ROUTES
+## ══════════════════════════════════════════
+
+```typescript
+// src/app/app.routes.ts
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: '',
+    loadComponent: () =>
+      import('./features/catalog/catalog.component').then(m => m.CatalogComponent),
+    title: 'Film Collection',
+  },
+  {
+    path: 'film/:id',
+    loadComponent: () =>
+      import('./features/film-detail/film-detail.component').then(m => m.FilmDetailComponent),
+    title: 'Film Details',
+  },
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./features/about/about.component').then(m => m.AboutComponent),
+    title: 'About',
+  },
+  { path: '**', redirectTo: '' },  // wildcard MUST be last
+];
+```
+
+**Rules:**
+- `loadComponent` on every feature route — always lazy load
+- Wildcard `**` is always the last entry, never earlier
+- No `ActivatedRoute` in components — `withComponentInputBinding()` handles params via `input()`
+- Use `RouterLink` in templates; never `router.navigate()` for user-triggered links
+
+---
+
+## ══════════════════════════════════════════
+## 5. TYPESCRIPT & MODELS
+## ══════════════════════════════════════════
+
+```typescript
+// src/app/models/film.model.ts
+export interface Film {
+  readonly id: number;
+  readonly title: string;
+  readonly year: number;
+  readonly genre: string;
+  readonly rating: number;      // 0–10
+  readonly duration: number;    // minutes
+  readonly description: string;
+  readonly posterUrl: string;
+  isFavorite: boolean;          // mutable — toggled by user
+}
+```
+
+```typescript
+// src/app/models/breadcrumb.model.ts
+export interface Breadcrumb {
+  readonly label: string;
+  readonly url: string;
+}
+```
+
+**Rules:**
+- `readonly` on every field that does not change after object creation
+- `interface` for data shapes, `type` for unions/aliases
+- Never `Partial<Film>` where a full `Film` is expected — be explicit
+- `id` is always `number` — never `string | number`
+- `models/` must not import from `@angular/*` — pure TypeScript only
+
+---
+
+## ══════════════════════════════════════════
+## 6. SIGNALS — USAGE RULES
+## ══════════════════════════════════════════
+
+```typescript
+// Mutable state owned by this service/component:
+const films = signal<Film[]>([]);
+
+// Derived state — NEVER use signal() for something computable:
+const favorites = computed(() => films().filter(f => f.isFavorite));
+
+// Route param bound from URL via withComponentInputBinding:
+readonly id = input.required<string>();   // :id segment → this.id()
+
+// Cross-component communication:
+readonly film = input.required<Film>();        // parent → child
+readonly favoriteToggled = output<number>();   // child → parent
+
+// Side effects only (logging, localStorage — not state derivation):
+effect(() => {
+  localStorage.setItem('favCount', String(favorites().length));
+});
+```
+
+### Signal rules:
+- NEVER call `.set()` / `.update()` inside `computed()` — it is read-only by design
+- NEVER store derived data in `signal()` if it can be expressed as `computed()`
+- NEVER mutate signal contents directly — always return a new reference:
+  ```typescript
+  // ✅ correct — new objects, new array
+  this._films.update(list =>
+    list.map(f => f.id === id ? { ...f, isFavorite: !f.isFavorite } : f)
+  );
+  // ❌ wrong — mutation bypasses signal change detection
+  this._films()[0].isFavorite = true;
+  ```
+- `effect()` is for side effects only — never derive state inside it
+- Private signal named `_name`; public surface via `_name.asReadonly()` or `computed()`
+
+---
+
+## ══════════════════════════════════════════
+## 7. SERVICES
+## ══════════════════════════════════════════
+
+### FilmService:
+```typescript
+// src/app/core/services/film.service.ts
+import { Injectable, computed, signal } from '@angular/core';
+import { Film } from '../../models/film.model';
+import { FILMS_MOCK } from '../../data/films.mock';
+
+@Injectable({ providedIn: 'root' })
+export class FilmService {
+  private readonly _films = signal<Film[]>(FILMS_MOCK);
+
+  readonly films    = this._films.asReadonly();
+  readonly favorites = computed(() => this._films().filter(f => f.isFavorite));
+
+  getById(id: number): Film | undefined {
+    return this._films().find(f => f.id === id);
+  }
+
+  toggleFavorite(id: number): void {
+    this._films.update(list =>
+      list.map(f => f.id === id ? { ...f, isFavorite: !f.isFavorite } : f)
+    );
+  }
+}
+```
+
+### BreadcrumbService — signals-only, no RxJS:
+```typescript
+// src/app/core/services/breadcrumb.service.ts
+import { Injectable, signal } from '@angular/core';
+import { Breadcrumb } from '../../models/breadcrumb.model';
+
+@Injectable({ providedIn: 'root' })
+export class BreadcrumbService {
+  private readonly _crumbs = signal<Breadcrumb[]>([]);
+  readonly crumbs = this._crumbs.asReadonly();
+
+  set(crumbs: Breadcrumb[]): void {
+    this._crumbs.set(crumbs);
+  }
+}
+```
+
+**Service rules:**
+- Always `providedIn: 'root'` — never provide in a component or feature
+- Private signal + `asReadonly()` for public exposure — enforces unidirectional flow
+- No constructor logic — initialize at field declaration
+- Methods are actions: update state and return `void`
+- No `async` methods (no HTTP in this project)
+
+---
+
+## ══════════════════════════════════════════
+## 8. COMPONENT RULES
+## ══════════════════════════════════════════
+
+### Component anatomy — required skeleton:
+```typescript
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+
+@Component({
+  selector: 'app-film-card',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,  // ALWAYS OnPush
+  imports: [/* only what this template uses — keep it minimal */],
+  templateUrl: './film-card.component.html',
+  styleUrl: './film-card.component.scss',
+})
+export class FilmCardComponent {
+  // 1. Inputs (signal-based)
+  readonly film = input.required<Film>();
+
+  // 2. Outputs
+  readonly favoriteToggled = output<number>();
+
+  // 3. Injected services (private — not accessible in template)
+  private readonly filmService = inject(FilmService);
+
+  // 4. Computed / derived state (protected — accessible in template)
+  protected readonly isHighRated = computed(() => this.film().rating >= 8);
+
+  // 5. Event handlers (protected)
+  protected onToggleFavorite(event: Event): void {
+    event.stopPropagation();
+    this.favoriteToggled.emit(this.film().id);
+  }
+}
+```
+
+### Smart vs Dumb component pattern — strictly enforced:
+
+| Component | Role | Injects services? | Has `input()`? |
+|-----------|------|-------------------|----------------|
+| `CatalogComponent` | Smart container | ✅ FilmService, BreadcrumbService | ❌ (it is a route root) |
+| `FilmDetailComponent` | Smart container | ✅ FilmService, BreadcrumbService | ✅ `id` from URL |
+| `AboutComponent` | Smart container | ✅ BreadcrumbService | ❌ |
+| `FilmCardComponent` | Dumb presentational | ❌ NO services | ✅ `film` from parent |
+| `HeaderComponent` | Structural | ❌ NO services | ❌ |
+| `BreadcrumbsComponent` | Structural | ✅ BreadcrumbService (read-only) | ❌ |
+| `FooterComponent` | Structural | ❌ NO services | ❌ |
+
+**Rules:**
+- `ChangeDetectionStrategy.OnPush` — no exceptions anywhere
+- `standalone: true` — no exceptions
+- `inject()` function always — never constructor injection
+- `input.required<T>()` for mandatory; `input<T>(defaultValue)` for optional
+- `protected` for template-facing; `private` for internal-only
+- NEVER put business logic in a component — delegate to service
+- Selector prefix always `app-`
+
+---
+
+## ══════════════════════════════════════════
+## 9. LAYOUT COMPONENTS
+## ══════════════════════════════════════════
+
+### HeaderComponent — links to Home + About with active state:
+```typescript
+@Component({
+  selector: 'app-header',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink, RouterLinkActive],
+  templateUrl: './header.component.html',
+})
+export class HeaderComponent {}
+```
+
+```html
+<!-- header.component.html -->
+<header class="header">
+  <a routerLink="/" class="header__logo">🎬 Film Collection</a>
+  <nav class="header__nav">
+    <a routerLink="/"
+       routerLinkActive="header__link--active"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="header__link">Home</a>
+    <a routerLink="/about"
+       routerLinkActive="header__link--active"
+       class="header__link">About</a>
+  </nav>
+</header>
+```
+
+### FooterComponent — year, author, GitHub:
+```typescript
+@Component({
+  selector: 'app-footer',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <footer class="footer">
+      <span>© {{ year }} Your Name</span>
+      <a href="https://github.com/your-username" target="_blank" rel="noopener noreferrer">
+        GitHub
+      </a>
+    </footer>
+  `,
+  styleUrl: './footer.component.scss',
+})
+export class FooterComponent {
+  protected readonly year = new Date().getFullYear();
+}
+```
+
+### BreadcrumbsComponent — reads signal from BreadcrumbService:
+```typescript
+@Component({
+  selector: 'app-breadcrumbs',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink],
+  templateUrl: './breadcrumbs.component.html',
+})
+export class BreadcrumbsComponent {
+  private readonly breadcrumbService = inject(BreadcrumbService);
+  protected readonly crumbs = this.breadcrumbService.crumbs;
+}
+```
+
+```html
+<!-- breadcrumbs.component.html -->
+<nav class="breadcrumbs" aria-label="breadcrumb">
+  @for (crumb of crumbs(); track crumb.url) {
+    @if (!$last) {
+      <a [routerLink]="crumb.url" class="breadcrumbs__link">{{ crumb.label }}</a>
+      <span class="breadcrumbs__sep" aria-hidden="true"> › </span>
+    } @else {
+      <span class="breadcrumbs__current" aria-current="page">{{ crumb.label }}</span>
+    }
+  }
+</nav>
+```
+
+**Breadcrumbs set by each smart component in `ngOnInit`:**
+```typescript
+// CatalogComponent → "Home"
+this.breadcrumbService.set([{ label: 'Home', url: '/' }]);
+
+// FilmDetailComponent → "Home › Film Title"
+this.breadcrumbService.set([
+  { label: 'Home', url: '/' },
+  { label: film?.title ?? 'Film', url: `/film/${this.id()}` },
+]);
+
+// AboutComponent → "Home › About"
+this.breadcrumbService.set([
+  { label: 'Home', url: '/' },
+  { label: 'About', url: '/about' },
+]);
+```
+
+---
+
+## ══════════════════════════════════════════
+## 10. FEATURE COMPONENTS — FULL TEMPLATES
+## ══════════════════════════════════════════
+
+### CatalogComponent (Smart):
+```typescript
+@Component({
+  selector: 'app-catalog',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FilmCardComponent, AutofocusDirective],
+  templateUrl: './catalog.component.html',
+})
+export class CatalogComponent implements OnInit {
+  private readonly filmService      = inject(FilmService);
+  private readonly breadcrumbService = inject(BreadcrumbService);
+
+  protected readonly searchQuery = signal('');
+
+  protected readonly filteredFilms = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    return q
+      ? this.filmService.films().filter(f => f.title.toLowerCase().includes(q))
+      : this.filmService.films();
+  });
+
+  ngOnInit(): void {
+    this.breadcrumbService.set([{ label: 'Home', url: '/' }]);
+  }
+
+  protected onSearchChange(value: string): void {
+    this.searchQuery.set(value);
+  }
+
+  protected onFavoriteToggled(id: number): void {
+    this.filmService.toggleFavorite(id);
+  }
+}
+```
+
+```html
+<!-- catalog.component.html -->
+<section class="catalog">
+  <input
+    appAutofocus
+    type="text"
+    class="catalog__search"
+    placeholder="Search films..."
+    [value]="searchQuery()"
+    (input)="onSearchChange($any($event.target).value)"
+    aria-label="Search films"
+  />
+  <div class="catalog__grid">
+    @for (film of filteredFilms(); track film.id) {
+      <app-film-card [film]="film" (favoriteToggled)="onFavoriteToggled($event)" />
+    } @empty {
+      <p class="catalog__empty">Nothing found</p>
+    }
+  </div>
+</section>
+```
+
+### FilmDetailComponent (Smart) — id via `input()`, no ActivatedRoute:
+```typescript
+@Component({
+  selector: 'app-film-detail',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink, DurationPipe],
+  templateUrl: './film-detail.component.html',
+})
+export class FilmDetailComponent implements OnInit {
+  // Automatically bound from :id URL segment by withComponentInputBinding()
+  readonly id = input.required<string>();
+
+  private readonly filmService       = inject(FilmService);
+  private readonly breadcrumbService = inject(BreadcrumbService);
+
+  protected readonly film = signal<Film | undefined>(undefined);
+
+  ngOnInit(): void {
+    const film = this.filmService.getById(Number(this.id()));
+    this.film.set(film);
+    this.breadcrumbService.set([
+      { label: 'Home', url: '/' },
+      { label: film?.title ?? 'Film', url: `/film/${this.id()}` },
+    ]);
+  }
+}
+```
+
+```html
+<!-- film-detail.component.html -->
+@if (film(); as f) {
+  <article class="film-detail">
+    <img [src]="f.posterUrl" [alt]="f.title" class="film-detail__poster" />
+    <div class="film-detail__info">
+      <h1 class="film-detail__title">{{ f.title }}</h1>
+      <p class="film-detail__meta">
+        {{ f.year }} · {{ f.genre }} · {{ f.duration | duration }} · ★ {{ f.rating }}
+      </p>
+      <p class="film-detail__description">{{ f.description }}</p>
+      <a routerLink="/" class="btn btn--back">← Back to catalog</a>
+    </div>
+  </article>
+} @else {
+  <div class="film-detail__not-found">
+    <p>Film not found.</p>
+    <a routerLink="/" class="btn">← Go back</a>
+  </div>
+}
+```
+
+### FilmCardComponent (Dumb):
+```html
+<!-- film-card.component.html -->
+<article class="film-card" [routerLink]="['/film', film().id]">
+  <img [src]="film().posterUrl" [alt]="film().title" class="film-card__poster" loading="lazy" />
+  <div class="film-card__body">
+    <h3 class="film-card__title">{{ film().title }}</h3>
+    <div class="film-card__meta">
+      <span>{{ film().year }}</span>
+      <span>{{ film().genre }}</span>
+      <span>★ {{ film().rating }}</span>
+    </div>
+    <button
+      type="button"
+      class="film-card__fav"
+      [class.film-card__fav--active]="film().isFavorite"
+      [attr.aria-label]="film().isFavorite ? 'Remove from favorites' : 'Add to favorites'"
+      (click)="onToggleFavorite($event)"
+    >
+      {{ film().isFavorite ? '♥' : '♡' }}
+    </button>
+  </div>
+</article>
+```
+
+---
+
+## ══════════════════════════════════════════
+## 11. CUSTOM DIRECTIVE — AUTOFOCUS
+## ══════════════════════════════════════════
+
+```typescript
+// src/app/shared/directives/autofocus.directive.ts
+import { AfterViewInit, Directive, ElementRef, inject } from '@angular/core';
+
+@Directive({
+  selector: '[appAutofocus]',
+  standalone: true,
+})
+export class AutofocusDirective implements AfterViewInit {
+  private readonly el = inject(ElementRef<HTMLElement>);
+
+  ngAfterViewInit(): void {
+    // setTimeout(0) — defers until after all child views are initialized
+    setTimeout(() => this.el.nativeElement.focus(), 0);
+  }
+}
+```
+
+Usage in template: `<input appAutofocus type="text" ... />`
+
+---
+
+## ══════════════════════════════════════════
+## 12. CUSTOM PIPE — DURATION
+## ══════════════════════════════════════════
+
+```typescript
+// src/app/shared/pipes/duration.pipe.ts
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'duration',
+  standalone: true,
+  pure: true,
+})
+export class DurationPipe implements PipeTransform {
+  transform(minutes: number): string {
+    if (!minutes || minutes <= 0) return '—';
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h === 0) return `${m}min`;
+    if (m === 0) return `${h}h`;
+    return `${h}h ${m}min`;
+  }
+}
+```
+
+Test cases: `60 → "1h"` · `45 → "45min"` · `90 → "1h 30min"` · `0 → "—"`
+
+---
+
+## ══════════════════════════════════════════
+## 13. LIFECYCLE HOOKS — USAGE RULES
+## ══════════════════════════════════════════
+
+With signals, most lifecycle hooks become unnecessary. Use only when truly required.
+
+| Hook | Use in | Reason |
+|------|--------|--------|
+| `ngOnInit` | `CatalogComponent`, `FilmDetailComponent`, `AboutComponent` | Set breadcrumbs; read route param; load film |
+| `ngAfterViewInit` | `AutofocusDirective` | DOM is guaranteed ready — safe to call `.focus()` |
+| `ngOnDestroy` | Not needed here | Signals clean up automatically; no subscriptions to cancel |
+| `ngOnChanges` | **Avoid** | Use `input()` + `computed()` instead — reactive by nature |
+| `ngDoCheck` | **Never** | Fires every CD cycle — extreme performance cost |
+| `ngAfterContentChecked` | **Never** | Same — extreme performance cost |
+
+**Rules:**
+- Always declare the interface: `implements OnInit`, `implements AfterViewInit`
+- NEVER declare signals inside `ngOnInit` — always at field level
+- NEVER derive state inside a lifecycle hook — use `computed()`
+- NEVER use `ngOnDestroy` just to call `markForCheck()` — OnPush + signals handles it
+
+---
+
+## ══════════════════════════════════════════
+## 14. TEMPLATES — NEW CONTROL FLOW
+## ══════════════════════════════════════════
+
+```html
+<!-- @for + @empty — preferred over @for + separate @if for empty state -->
+@for (film of filteredFilms(); track film.id) {
+  <app-film-card [film]="film" (favoriteToggled)="onFavoriteToggled($event)" />
+} @empty {
+  <p class="empty-state">Nothing found</p>
+}
+
+<!-- @if with alias — avoids calling signal() multiple times -->
+@if (film(); as f) {
+  <h1>{{ f.title }}</h1>
+  <p>{{ f.description }}</p>
+}
+
+<!-- @switch for genre/category rendering -->
+@switch (film().genre) {
+  @case ('Drama')  { <span class="badge--drama">Drama</span> }
+  @case ('Action') { <span class="badge--action">Action</span> }
+  @default         { <span class="badge">{{ film().genre }}</span> }
+}
+
+<!-- ❌ NEVER: -->
+<li *ngFor="let film of films; trackBy: trackById">...</li>
+<p *ngIf="!films.length">Nothing found</p>
+```
+
+**Template rules:**
+- `track film.id` always — never `track $index` for entity lists
+- `@for ... @empty` for list + empty state — cleaner than a separate `@if`
+- `@if (signal(); as alias)` — reads signal once, reuses result
+- No method calls that return new arrays/objects — use `computed()`
+- Self-close components with no content: `<app-film-card ... />`
+- Call signals with `()` in templates: `film()` not `film`
+
+---
+
+## ══════════════════════════════════════════
+## 15. PERFORMANCE OPTIMIZATION
+## ══════════════════════════════════════════
+
+### Always:
+- `ChangeDetectionStrategy.OnPush` on every component — no exceptions
+- `pure: true` on every pipe (it is the default, but declare it explicitly)
+- `track film.id` in `@for` — Angular reuses DOM nodes, skips recreation
+- `loadComponent` lazy loading — features bundle separately
+- `computed()` for all derived state — cached, re-evaluates only on dependency change
+- `readonly` on every signal, computed reference, and injected service
+- `loading="lazy"` on `<img>` tags not in the initial viewport
+
+### Never:
+```html
+<!-- ❌ BAD — method call creates new array on every CD cycle -->
+@for (film of getFilteredFilms(); track film.id) { ... }
+
+<!-- ✅ GOOD — computed() result is cached -->
+@for (film of filteredFilms(); track film.id) { ... }
+```
+
+### How OnPush + Signals work together:
+Angular re-checks a component ONLY when:
+1. An `input()` signal changes (new reference)
+2. A DOM event fires inside the component
+3. A signal that the template reads changes (automatic)
+
+Result: maximum performance without manual `markForCheck()` calls.
+
+---
+
+## ══════════════════════════════════════════
+## 16. SOLID PRINCIPLES IN THIS PROJECT
+## ══════════════════════════════════════════
+
+### S — Single Responsibility:
+- `FilmService` — film state only (no routing, no formatting, no breadcrumbs)
+- `BreadcrumbService` — breadcrumb state only
+- `DurationPipe` — duration formatting only
+- `AutofocusDirective` — focus behavior only
+- `FilmCardComponent` — renders one card, emits one event
+
+### O — Open/Closed:
+- Add sorting: new `computed()` in `FilmService`, zero changes to existing code
+- Add filter by genre: new `signal()` + `computed()` in `CatalogComponent`
+- Components are configurable via `input()` without internal modification
+
+### L — Liskov Substitution:
+- Any valid `Film` object works in any component accepting `Film`
+- No id-specific conditionals inside `FilmCardComponent`
+
+### I — Interface Segregation:
+- `FilmCardComponent` receives `Film` via `input()` — not the whole `FilmService`
+- `BreadcrumbsComponent` reads only `crumbs` signal — not any film data
+
+### D — Dependency Inversion:
+- Components depend on `Film` interface, not on `FilmService` implementation
+- `inject()` makes all dependencies explicit and testable
+
+---
+
+## ══════════════════════════════════════════
+## 17. DRY · KISS · YAGNI
+## ══════════════════════════════════════════
+
+### DRY:
+- `Film` and `Breadcrumb` interfaces defined once, imported everywhere
+- Duration logic lives only in `DurationPipe`
+- Autofocus logic lives only in `AutofocusDirective`
+- Breadcrumb state lives only in `BreadcrumbService`
+
+### KISS:
+- `getById()` is a one-liner `.find()` — not a `Map` unless proven necessary
+- Breadcrumbs set imperatively in `ngOnInit` — no route resolvers, no complex registry
+- No abstract factories, no token injection, no strategy pattern for a catalog
+
+### YAGNI:
+- No HTTP client (no real API)
+- No NgRx / Akita / state library — signals are sufficient
+- No lazy-loaded feature modules — `loadComponent` is enough
+- No caching layer — mock data is synchronous
+- No route resolvers or guards — unnecessary complexity here
+
+---
+
+## ══════════════════════════════════════════
+## 18. SCSS RULES
+## ══════════════════════════════════════════
+
+```scss
+// styles.scss — design tokens only
+:root {
+  --color-primary:   #e50914;
+  --color-bg:        #141414;
+  --color-surface:   #1f1f1f;
+  --color-text:      #ffffff;
+  --color-muted:     #a0a0a0;
+  --color-border:    #333333;
+  --radius-card:     8px;
+  --transition-fast: 150ms ease;
+}
+
+// Component SCSS — BEM-lite naming
+.film-card           { ... }
+.film-card__poster   { ... }
+.film-card__title    { ... }
+.film-card--active   { ... }   // modifier: --
+```
+
+**Rules:**
+- NO global utility classes — component-scoped BEM only
+- Angular `ViewEncapsulation.Emulated` (default) — do not disable it
+- CSS variables in `:root` for all design tokens (colors, spacing, radius)
+- `rem` for font sizes · `px` for borders/shadows · `%`/`fr`/`gap` for layout
+- Responsive: use CSS Grid + Flexbox — no fixed-width containers
+
+---
+
+## ══════════════════════════════════════════
+## 19. FILE NAMING CONVENTIONS
+## ══════════════════════════════════════════
+
+| Type | Convention | Example |
+|------|-----------|---------|
+| Component | `kebab-case.component.ts` | `film-card.component.ts` |
+| Service | `kebab-case.service.ts` | `breadcrumb.service.ts` |
+| Directive | `kebab-case.directive.ts` | `autofocus.directive.ts` |
+| Pipe | `kebab-case.pipe.ts` | `duration.pipe.ts` |
+| Model/Interface | `kebab-case.model.ts` | `film.model.ts` |
+| Mock data | `kebab-case.mock.ts` | `films.mock.ts` |
+
+- Classes: `PascalCase` — `FilmCardComponent`, `BreadcrumbService`
+- Signals/computed: `camelCase` — `filteredFilms`, `searchQuery`
+- Constants: `SCREAMING_SNAKE_CASE` — `FILMS_MOCK`
+- Private signal backing store: `_` prefix — `_films`, `_crumbs`
+
+---
+
+## ══════════════════════════════════════════
+## 20. WHAT CURSOR MUST NEVER GENERATE
+## ══════════════════════════════════════════
+
+- `NgModule`, `@NgModule`, `AppModule`, `BrowserModule`, `*.module.ts` files
+- `*ngFor`, `*ngIf`, `*ngSwitch`, `[ngClass]`, `[ngStyle]`
+- Any import from `'rxjs'` or `'rxjs/operators'`
+- `Observable`, `Subject`, `BehaviorSubject`, `of`, `from`, `pipe()`, `subscribe()`, `takeUntil`, `combineLatest`, `switchMap` or any RxJS operator
+- `toSignal` / `toObservable` from `@angular/core/rxjs-interop`
+- `@Input()` / `@Output()` decorators — use `input()` / `output()` functions
+- Constructor-based injection: `constructor(private x: X)` — use `inject()`
+- `ChangeDetectionStrategy.Default` — always `OnPush`
+- `standalone: false`
+- `any` type annotation
+- `document.querySelector` / `document.getElementById` outside of directives
+- `ActivatedRoute` injection in components — use `input()` with `withComponentInputBinding()`
+- `async` pipe (no observables exist in this project)
+- `*.module.ts` files of any kind
+
+---
+
+## ══════════════════════════════════════════
+## 21. CHECKLIST — BEFORE COMMITTING
+## ══════════════════════════════════════════
+
+- [ ] `ng build` — zero errors, zero warnings
+- [ ] `ng lint` — zero issues
+- [ ] `grep -r "from 'rxjs'" src/` → empty output (no RxJS anywhere)
+- [ ] Every component: `standalone: true` + `ChangeDetectionStrategy.OnPush`
+- [ ] `withComponentInputBinding()` present in `app.config.ts`
+- [ ] `FilmService` and `BreadcrumbService`: `providedIn: 'root'`
+- [ ] Route params read via `input()` — no `ActivatedRoute` in components
+- [ ] `@for` tracks by `film.id`, never by `$index`
+- [ ] `@empty` block handles "Nothing found" in catalog
+- [ ] `appAutofocus` applied to search input
+- [ ] `duration` pipe used in film-detail template
+- [ ] Header has Home + About links with `routerLinkActive`
+- [ ] Footer shows current year + author name + GitHub link
+- [ ] Breadcrumbs: "Home" on catalog · "Home › Film Title" on detail · "Home › About" on about
+- [ ] Film title is NOT clickable in breadcrumbs (current page)
+- [ ] Favorite toggle works and persists within the session
+- [ ] Wildcard route redirects to home
+- [ ] `README.md` includes project description + `ng serve` instructions
+- [ ] GitHub repository is public
