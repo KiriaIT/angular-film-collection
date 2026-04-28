@@ -6,14 +6,28 @@
         appAutofocus
         type="search"
         class="catalog__search"
-        placeholder="Search films by title..."
+        placeholder="Search by title or genre..."
         [value]="searchQuery()"
         (input)="onSearchChange($event)"
         autocomplete="off"
-        aria-label="Search films"
+        aria-label="Search films by title or genre"
       />
     </label>
-    <div class="catalog__sort-group" role="group" aria-label="Sort films">
+    <div class="catalog__sort-group" role="group" aria-label="Sort and filter films">
+      <label class="catalog__sort">
+        <span class="catalog__sort-label">Genre</span>
+        <select
+          class="catalog__select"
+          [value]="genreFilter()"
+          (change)="onGenreChange($event)"
+          aria-label="Filter by genre"
+        >
+          <option value="">All genres</option>
+          @for (g of genreOptions(); track g) {
+            <option [value]="g">{{ g }}</option>
+          }
+        </select>
+      </label>
       <label class="catalog__sort">
         <span class="catalog__sort-label">Sort by</span>
         <select
@@ -44,7 +58,7 @@
           type="button"
           class="catalog__clear"
           (click)="onClearFilters()"
-          aria-label="Clear search and reset sort to defaults"
+          aria-label="Clear search, genre filter, and reset sort to defaults"
         >
           Clear all
         </button>
@@ -119,14 +133,14 @@
           <h2 class="catalog__empty-title">Nothing found</h2>
           <p class="catalog__empty-hint">
             @if (hasActiveFilters()) {
-              No films match your search or filters. Try resetting below.
+              No films match your search, genre, or sort. Try resetting below.
             } @else {
               The catalog is empty.
             }
           </p>
           @if (hasActiveFilters()) {
             <button type="button" class="catalog__empty-reset" (click)="onClearFilters()">
-              Reset search &amp; sort
+              Reset filters
             </button>
           }
         </div>

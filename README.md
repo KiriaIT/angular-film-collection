@@ -4,10 +4,10 @@ Small **Angular 20** learning project: a film catalog backed by mock data. It de
 
 ## Features
 
-- Home catalog with title search, sort by title/year/rating, **Clear all** to reset filters, favorite toggles (favorites **persist** in `localStorage` across refresh), and navigation to film details
-- Catalog **skeleton placeholders** on the first paint, then real cards (`afterNextRender` in `CatalogComponent` — no `setTimeout` for reactive loading state, per project rules)
+- Home catalog with search (**title or genre** substring), **genre** dropdown (All + dynamic list), sort by title/year/rating, **Clear all** to reset filters, favorite toggles (favorites **persist** in `localStorage` across refresh), and navigation to film details
+    - Catalog **skeleton placeholders** on the first paint, then real cards (`afterNextRender` in `CatalogComponent` — no `setTimeout` for reactive loading state, per project rules)
 - **Empty state** when search returns no films: inline illustration, hint text, and **Reset search & sort** when filters are active
-- **Export to JSON** on the catalog toolbar — downloads the **current list** (after search and sort) as pretty-printed JSON
+- **Export to JSON** on the catalog toolbar — downloads the **current list** (after search, genre, and sort) as pretty-printed JSON; **Favorites** page has **Export favorites JSON** (sorted by title)
 - Mock films from **`src/app/data/films.json`** — same **`posterUrl`** strings as the RS School [films.json](https://cdn.jsdelivr.net/gh/rolling-scopes-school/tasks@master/angular/tasks/angular-intro-task/films.json) task file (`placehold.co`). **`posterDisplayUrl()`** only normalizes the URL for the `<img>` (e.g. `300x450` → `300x450.png`); the JSON file is not rewritten. On load error, fallback is still **placehold.co** with the film title
 - **Light / dark** theme toggle (persisted in `localStorage`) with smooth color transitions
 - Enter animations on cards and hover motion on posters
@@ -17,7 +17,7 @@ Small **Angular 20** learning project: a film catalog backed by mock data. It de
 - Header, breadcrumbs, and footer on every view
 - **404 page** for unknown URLs: animated illustration, **Take me home** (`routerLink`), breadcrumbs, and document title `Film Collection | Page Not Found` via the route `title` property
 - **A11y:** film cards expose **View details for …** on the navigable card; favorite control keeps `aria-label`
-- **Unit tests:** `DurationPipe` (e.g. 90 → `1h 30min`) and `FilmService.toggleFavorite()` — run with `ng test`
+- **Unit / component tests:** `DurationPipe`, `posterDisplayUrl`, `FilmService.toggleFavorite()`, `FilmCardComponent`, `CatalogComponent` (genre filter), `FavoritesComponent` (export); **routing smoke** in `app.integration.spec.ts` — run with `ng test`
 
 The repo’s `films.json` matches the official task file; poster URLs stay **placehold.co**. Normalization happens in `shared/utils/poster-display.ts` at display time only.
 
@@ -58,7 +58,7 @@ This task is not graded, but it is a **mandatory prerequisite** for applying for
 - [x] Film service registered globally — `FilmService` `providedIn: 'root'`
 - [x] Collection in `signal()` — `_films` in `core/services/film.service.ts`
 - [x] Favorites via `computed()` — `favorites`; catalog filtering via `computed()` — `filteredFilms` / `displayedFilms` in `catalog.component.ts`
-- [x] Search by title — `searchQuery` signal + `filteredFilms`
+- [x] Search by title (task) — extended to **title or genre** in `filteredFilms`; `searchQuery` signal + `computed()`
 
 ### Code quality
 

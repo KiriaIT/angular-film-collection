@@ -18,4 +18,17 @@ describe('DurationPipe', () => {
   it('converts 45 minutes to 45min', () => {
     expect(pipe.transform(45)).toBe('45min');
   });
+
+  it('returns em dash for zero or negative minutes', () => {
+    expect(pipe.transform(0)).toBe('—');
+    expect(pipe.transform(-5)).toBe('—');
+  });
+
+  it('converts 61 minutes to 1h 1min', () => {
+    expect(pipe.transform(61)).toBe('1h 1min');
+  });
+
+  it('converts 105 minutes to 1h 45min', () => {
+    expect(pipe.transform(105)).toBe('1h 45min');
+  });
 });

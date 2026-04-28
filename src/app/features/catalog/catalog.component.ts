@@ -37,19 +37,43 @@ export class CatalogComponent implements OnInit {
   ];
 
   protected readonly searchQuery = signal('');
+  /** Empty string = all genres. */
+  protected readonly genreFilter = signal('');
   protected readonly sortKey = signal<CatalogSortKey>('title');
   protected readonly sortDir = signal<CatalogSortDir>('asc');
 
+  protected readonly genreOptions = computed(() => {
+    const genres = new Set<string>();
+    for (const f of this.filmService.films()) {
+      genres.add(f.genre);
+    }
+    return [...genres].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+  });
+
   protected readonly hasActiveFilters = computed(() => {
     const q = this.searchQuery().trim();
-    return q !== '' || this.sortKey() !== 'title' || this.sortDir() !== 'asc';
+    return (
+      q !== '' ||
+      this.genreFilter() !== '' ||
+      this.sortKey() !== 'title' ||
+      this.sortDir() !== 'asc'
+    );
   });
 
   protected readonly filteredFilms = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    return q
-      ? this.filmService.films().filter((f) => f.title.toLowerCase().includes(q))
-      : this.filmService.films();
+    const genre = this.genreFilter();
+    let list = this.filmService.films();
+    if (q) {
+      list = list.filter(
+        (f) =>
+          f.title.toLowerCase().includes(q) || f.genre.toLowerCase().includes(q),
+      );
+    }
+    if (genre) {
+      list = list.filter((f) => f.genre === genre);
+    }
+    return list;
   });
 
   protected readonly displayedFilms = computed(() => {
@@ -109,8 +133,16 @@ export class CatalogComponent implements OnInit {
 
   protected onClearFilters(): void {
     this.searchQuery.set('');
+    this.genreFilter.set('');
     this.sortKey.set('title');
     this.sortDir.set('asc');
+  }
+
+  protected onGenreChange(event: Event): void {
+    const target = event.target;
+    if (target instanceof HTMLSelectElement) {
+      this.genreFilter.set(target.value);
+    }
   }
 
   protected onExportCatalogJson(): void {
