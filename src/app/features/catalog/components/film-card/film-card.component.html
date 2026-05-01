@@ -30,7 +30,11 @@
     <div class="film-card__meta">
       <span>{{ film().year }}</span>
       <span>{{ film().genre }}</span>
-      <span [class.film-card__rating--high]="isHighRated()">★ {{ film().rating }}</span>
+      <span
+        class="film-card__stars"
+        [class.film-card__rating--high]="isHighRated()"
+        [attr.aria-label]="film().rating + ' out of 10'"
+      >{{ film().rating | stars }} {{ film().rating }}</span>
     </div>
   </div>
 </article>

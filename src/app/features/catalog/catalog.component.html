@@ -29,6 +29,20 @@
         </select>
       </label>
       <label class="catalog__sort">
+        <span class="catalog__sort-label">Decade</span>
+        <select
+          class="catalog__select"
+          [value]="decadeFilter()"
+          (change)="onDecadeChange($event)"
+          aria-label="Filter by decade"
+        >
+          <option value="">All decades</option>
+          @for (d of decadeOptions(); track d) {
+            <option [value]="d">{{ d }}</option>
+          }
+        </select>
+      </label>
+      <label class="catalog__sort">
         <span class="catalog__sort-label">Sort by</span>
         <select
           class="catalog__select"
@@ -65,6 +79,15 @@
       }
       <button
         type="button"
+        class="catalog__random"
+        (click)="onRandomFilm()"
+        aria-label="Navigate to a random film"
+        title="Random film"
+      >
+        🎲 Random
+      </button>
+      <button
+        type="button"
         class="catalog__export"
         (click)="onExportCatalogJson()"
         aria-label="Export currently listed films to a JSON file"
@@ -73,6 +96,8 @@
       </button>
     </div>
   </div>
+
+  <p class="catalog__count" aria-live="polite" aria-atomic="true">{{ filmsCountText() }}</p>
 
   @if (!catalogContentReady()) {
     <div

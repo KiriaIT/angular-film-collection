@@ -64,6 +64,10 @@
   color: var(--color-muted);
 }
 
+.film-card__stars {
+  letter-spacing: 0.05em;
+}
+
 .film-card__rating--high {
   color: #f5c518;
 }

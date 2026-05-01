@@ -4,12 +4,13 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Film } from '../../../../models/film.model';
 import { posterDisplayUrl } from '../../../../shared/utils/poster-display';
 import { posterFallbackUrl } from '../../../../shared/utils/poster-fallback';
+import { StarsPipe } from '../../../../shared/pipes/stars.pipe';
 
 @Component({
   selector: 'app-film-card',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, StarsPipe],
   templateUrl: './film-card.component.html',
   styleUrl: './film-card.component.scss',
   animations: [

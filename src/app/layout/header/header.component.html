@@ -13,8 +13,12 @@
         routerLink="/favorites"
         routerLinkActive="header__link--active"
         class="header__link"
-        >Favorites</a
-      >
+        [attr.aria-label]="'Favorites: ' + favoritesCount().length + ' films'"
+      >Favorites
+        @if (favoritesCount().length > 0) {
+          <span class="header__badge" aria-hidden="true">{{ favoritesCount().length }}</span>
+        }
+      </a>
       <a routerLink="/about" routerLinkActive="header__link--active" class="header__link">About</a>
     </nav>
     <app-theme-toggle />
